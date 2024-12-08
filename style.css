@@ -21,10 +21,10 @@ img {
 img, img.hide {
   /* visibility: hidden; */
   opacity: 0;
-  transition: opacity 1s;
+  transition: opacity 0.5s;
 }
 img.show {
   /* visibility: visible; */
   opacity: 1;
-  transition: opacity 1s;
+  transition: opacity 0.5s;
 }

@@ -84,7 +84,7 @@ function nextImage () {
       image.classList.remove('hide')
       image.src = getImageFilePath()
     },
-    1005) // A little longer than the 1s fade-out
+    1000)
   
 }
 
