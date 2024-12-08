@@ -1,7 +1,9 @@
 const interval = 5
+const transition = 0.5
 var currentImageIndex = 0
 var image
 var intervalTimer
+var transitionTimer
 const images = [
   "001-002",
   "003",
@@ -69,6 +71,7 @@ function getImageFilePath() {
 }
 
 function nextImage () {
+  clearTimeout(transitionTimer)
   image.classList.add('hide')
   image.classList.remove('show')
   currentImageIndex++
@@ -76,12 +79,12 @@ function nextImage () {
   if (currentImageIndex == images.length) {
     currentImageIndex = 0
   }
-  const transitionTimer = setTimeout(() => {
+  transitionTimer = setTimeout(() => {
       image.classList.add('show')
       image.classList.remove('hide')
       image.src = getImageFilePath()
     },
-    1000)
+    1005) // A little longer than the 1s fade-out
   
 }
 
