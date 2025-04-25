@@ -1,10 +1,12 @@
-const interval = 5
-const transition = 0.5
+const interval = 4
+const transition = 1
+const delay = 0.1
+const secondsToMilliseconds = 1000
 var currentImageIndex = 0
-var image
+var images = []
 var intervalTimer
 var transitionTimer
-const images = [
+const imageNames = [
   "001-002",
   "003",
   "004",
@@ -57,35 +59,68 @@ const images = [
   "099",
   "100"]
 
-function slideShow () {
-  image = document.createElement('img')
-  image.id = 'image'
-  image.classList.add('show')
-  image.src = getImageFilePath()
-  document.body.appendChild(image)
-  intervalTimer = setInterval(nextImage, interval * 1000)
-}
-
 function getImageFilePath() {
-  return 'images/' + images[currentImageIndex] + '.jpg'
+  return 'images/' + imageNames[currentImageIndex] + '.jpg'
 }
 
-function nextImage () {
-  clearTimeout(transitionTimer)
-  image.classList.add('hide')
-  image.classList.remove('show')
+function setNextImageIndex() {
   currentImageIndex++
   // Continuously loop
-  if (currentImageIndex == images.length) {
+  if (currentImageIndex == imageNames.length) {
     currentImageIndex = 0
   }
-  transitionTimer = setTimeout(() => {
-      image.classList.add('show')
-      image.classList.remove('hide')
-      image.src = getImageFilePath()
-    },
-    1000)
-  
 }
 
-window.addEventListener('load', (event) => {slideShow()})
+function hidePreviousImage() {
+  let previousImageIndex = currentImageIndex - 1
+  if (previousImageIndex == -1) {
+    previousImageIndex = images.length - 1
+  }
+  images[previousImageIndex].classList.add('hide')
+  images[previousImageIndex].classList.remove('show')
+  setTimeout((previousImageIndex) => {  
+    images[previousImageIndex].classList.add('hidden')
+    images[previousImageIndex].classList.remove('hide')
+  }, transition * secondsToMilliseconds, previousImageIndex)
+}
+
+function showCurrentImage () {
+  // Hide the previous image, if there is one
+  if (images.length > 1) {
+    // If the length of the images array is 1, then there is no previous image to hide
+    hidePreviousImage()
+  }
+  // Wait for previous image to hide itself
+  setTimeout(() => {
+    // Show the current image
+    images[currentImageIndex].classList.add('hide')
+    images[currentImageIndex].classList.remove('hidden')
+    images[currentImageIndex].classList.add('show')
+    images[currentImageIndex].classList.remove('hide')
+    // Wait for a while, then show the next image
+    setTimeout(() => {
+      setNextImageIndex()
+      showImage()
+    }, interval * secondsToMilliseconds)
+  }, (transition + delay) * secondsToMilliseconds, currentImageIndex)
+}
+
+function showImage () {
+  if (images.length < (currentImageIndex + 1)) {
+    // image element not yet created; create it now
+    let image = document.createElement('img')
+    image.dataset.index = currentImageIndex
+    image.classList.add('hidden')
+    image.src = getImageFilePath()
+    image.onload = (event) => {
+      showCurrentImage()
+    }
+    images[currentImageIndex] = image
+    document.body.appendChild(images[currentImageIndex])
+  } else {
+    // image element already created; just show it
+    showCurrentImage()
+  }
+}
+
+window.addEventListener('load', (event) => {showImage()})
